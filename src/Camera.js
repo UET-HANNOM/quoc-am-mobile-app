@@ -17,19 +17,19 @@ export default function Camera({navigation}) {
 
   const postImage = async (response) => {
 
-    const resonseApi = await fetch('https://quoc-am-server.herokuapp.com/sampleData', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(response),
-    });
+    // const resonseApi = await fetch('https://quoc-am-server.herokuapp.com/sampleData', {
+    //   method: 'POST',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(response),
+    // });
 
-    const jsonData = await resonseApi.json()
+    // const jsonData = await resonseApi.json()
 
     
-    return jsonData
+    // return jsonData
 
   };
 
@@ -101,12 +101,9 @@ export default function Camera({navigation}) {
           return;
         }
         
-        postImage(response)
         navigation.navigate("Result",{
           translate:response,
-          result:  fileText
         })
-        setFilePath(response);
       });
     }
   };

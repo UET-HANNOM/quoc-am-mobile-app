@@ -2,12 +2,12 @@ import React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 
 export default function Result({ route, navigation }) {
-    const {translate,result} = route.params
+    const {translate} = route.params
     // console.log(route.params)
     return (
         <View>
             <Image source={{uri: translate.uri}} style={styles.imageStyle} />
-            <Text>{result}</Text>
+            <Text>đá</Text>
         </View>
     )
 }
