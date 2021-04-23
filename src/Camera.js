@@ -1,36 +1,39 @@
-import React, {useState} from 'react';
+/* eslint-disable no-alert */
+import React from 'react';
+import {useState} from 'react';
 // Import required components
 import {
   SafeAreaView,
   StyleSheet,
-  Text,
   View,
-  TouchableOpacity,
-  Image,
   Platform,
   PermissionsAndroid,
 } from 'react-native';
+import {Button, Text} from 'react-native-elements';
+import {Icon} from 'react-native-elements/dist/icons/Icon';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 export default function Camera({navigation}) {
-
-
-  const postImage = async (response) => {
-
-    // const resonseApi = await fetch('https://quoc-am-server.herokuapp.com/sampleData', {
-    //   method: 'POST',
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(response),
-    // });
-
-    // const jsonData = await resonseApi.json()
-
-    
-    // return jsonData
-
+  const [text, setText] = useState();
+  const [loading, setLoading] = useState();
+  const postImage = async image => {
+    fetch('https://quoc-am-server.herokuapp.com/sampleData', {
+      method: 'POST', // or 'PUT'
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({data: ''}),
+    })
+      .then(response => response.json())
+      .then(data => {
+        setText(data);
+        console.log('Success:', data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      })
+      .finally(() => setLoading(false));
   };
 
   const requestCameraPermission = async () => {
@@ -49,7 +52,9 @@ export default function Camera({navigation}) {
         console.warn(err);
         return false;
       }
-    } else return true;
+    } else {
+      return true;
+    }
   };
 
   const requestExternalWritePermission = async () => {
@@ -69,7 +74,9 @@ export default function Camera({navigation}) {
         alert('Write permission err', err);
       }
       return false;
-    } else return true;
+    } else {
+      return true;
+    }
   };
 
   const captureImage = async type => {
@@ -86,7 +93,6 @@ export default function Camera({navigation}) {
     let isStoragePermitted = await requestExternalWritePermission();
     if (isCameraPermitted && isStoragePermitted) {
       launchCamera(options, response => {
-
         if (response.didCancel) {
           alert('User cancelled camera picker');
           return;
@@ -100,10 +106,10 @@ export default function Camera({navigation}) {
           alert(response.errorMessage);
           return;
         }
-        
-        navigation.navigate("Result",{
-          translate:response,
-        })
+
+        navigation.navigate('Preview', {
+          image: response,
+        });
       });
     }
   };
@@ -116,7 +122,6 @@ export default function Camera({navigation}) {
       quality: 1,
     };
     launchImageLibrary(options, response => {
-
       if (response.didCancel) {
         alert('User cancelled camera picker');
         return;
@@ -130,28 +135,34 @@ export default function Camera({navigation}) {
         alert(response.errorMessage);
         return;
       }
-     
-
-      setFilePath(response);
+      navigation.navigate('Preview', {
+        image: response,
+      });
+      // setFilePath(response);
     });
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <View style={styles.container}>
-        <TouchableOpacity
-          activeOpacity={0.5}
-          style={styles.buttonStyle}
-          onPress={() => captureImage('photo')}>
-          <Text style={styles.textStyle}>Launch Camera for Image</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.5}
-          style={styles.buttonStyle}
-          onPress={() => chooseFile('photo')}>
-          <Text style={styles.textStyle}>Choose Image</Text>
-        </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.title}>
+        <Text h4>Tải lên một bức ảnh</Text>
+        <Text>Chúng tôi sẽ quét bức ảnh và giúp bạn đọc nó</Text>
       </View>
+
+      <Button
+        icon={
+          <Icon name="camera-alt" type="material" size={32} color="white" />
+        }
+        onPress={() => captureImage('photo')}
+        title="Chụp ảnh"
+      />
+      <Button
+        icon={
+          <Icon name="file-upload" type="material" size={32} color="white" />
+        }
+        onPress={() => chooseFile('photo')}
+        title="Chọn ảnh"
+      />
     </SafeAreaView>
   );
 }
@@ -161,26 +172,10 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#fff',
     alignItems: 'center',
+    justifyContent: 'space-around',
   },
-  titleText: {
-    fontSize: 22,
-    fontWeight: 'bold',
+  title: {
     textAlign: 'center',
-    paddingVertical: 20,
-  },
-  textStyle: {
-    padding: 10,
-    color: 'black',
-  },
-  buttonStyle: {
     alignItems: 'center',
-    flexDirection: 'row',
-    backgroundColor: '#DDDDDD',
-    padding: 5,
-  },
-  imageStyle: {
-    width: 200,
-    height: 200,
-    margin: 5,
   },
 });
